@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalog Design — Full &amp; Design System</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bg: 'var(--bg-color)',
+            surface: 'var(--surface-color)',
+            border: 'var(--border-color)',
+            main: 'var(--main-color)',
+            muted: 'var(--muted-color)',
+            oceanBlue: '#0066CC',
+            orangeAccent: '#EA580C',
+          },
+          fontFamily: {
+            manrope: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          borderRadius: {
+            '2xl': '24px',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- GSAP & ScrollTrigger CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  
+  <!-- Lenis Smooth Scroll CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.css">
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #F8FAFC;
+      --surface-color: #FFFFFF;
+      --border-color: #E2E8F0;
+      --main-color: #0F172A;
+      --muted-color: #64748B;
+      --loader-bg: #F8FAFC;
+    }
+
+    .dark {
+      --bg-color: #0B0F17;
+      --surface-color: #111827;
+      --border-color: #1F2937;
+      --main-color: #F8FAFC;
+      --muted-color: #9CA3AF;
+      --loader-bg: #0B0F17;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-color);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--muted-color);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--main-color);
+      overflow-x: hidden;
+      cursor: default;
+      transition: background-color 1s ease, color 2s ease;
+    }
+
+    #cursor {
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s ease, height 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+      will-change: transform;
+    }
+
+    .img-zoom-container {
+      overflow: hidden;
+    }
+    .img-zoom-container img {
+      transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .project-card:hover .img-zoom-container img {
+      transform: scale(1.04);
+    }
+  </style>
+</head>
+<body class="bg-bg text-main antialiased selection:bg-oceanBlue selection:text-white">
+
+  <div id="cursor" class="hidden md:flex items-center justify-center rounded-full border border-oceanBlue/40 bg-oceanBlue/10 w-5 h-5 text-xs text-main pointer-events-none">
+    <span id="cursor-text" class="opacity-0 transition-opacity duration-200"></span>
+  </div>
+
+  <header class="fixed top-0 left-0 w-full z-40 bg-bg/85 backdrop-blur-md border-b border-border/80 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
+      <a href="index.html" class="text-sm md:text-base font-bold tracking-tight hover:text-oceanBlue transition-colors flex items-center gap-2">
+        <img src="assets/logo-01.png" alt="Logo" class="h-24 transition-all duration-300">
+      </a>
+
+     <nav class="hidden md:flex items-center space-x-8 text-sm text-muted font-medium">
+        <a href="#work" class="hover:bg-oceanBlue hover:text-white hover:shadow-white/50 transition-colors bg-white/50 shadow-inner shadow-white rounded-full px-4 py-2 text-black text-xs">Corporate</a>
+        <a href="#uiux" class="hover:bg-oceanBlue hover:text-white hover:shadow-white/50 transition-colors bg-white/50 shadow-inner shadow-white rounded-full px-4 py-2 text-black text-xs">Freelance</a>
+        <a href="#about" class="hover:bg-oceanBlue hover:text-white hover:shadow-white/50 transition-colors bg-white/50 shadow-inner shadow-white rounded-full px-4 py-2 text-black text-xs">Personal</a>
+        <a href="#contact" class="hover:bg-oceanBlue hover:text-white hover:shadow-white/50 transition-colors bg-white/50 shadow-inner shadow-white rounded-full px-4 py-2 text-black text-xs">Contact</a>
+      </nav>
+
+     <div class="flex items-center gap-3">
+        <button id="theme-toggle" aria-label="Toggle Theme" class="w-10 h-10 rounded-full bg-white/50 flex dark:text-black dark:hover:text-white shadow-inner shadow-white items-center justify-center text-muted hover:bg-oceanBlue hover:text-white hover:shadow-white/50 transition-colors">
+          <svg id="sun-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <svg id="moon-icon" class="w-4 h-4 block text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+
+        <a href="#contact" class="hidden sm:inline-block px-4 py-2 dark:text-black dark:hover:text-white rounded-full bg-white/50 text-xs hover:shadow-white/50 shadow-inner shadow-white font-semibold text-main hover:bg-oceanBlue hover:text-white transition-all duration-300">
+          Get in touch
+        </a>
+        <button id="menu-btn" aria-label="Toggle Menu" class="md:hidden w-10 h-10 rounded-full border border-border bg-surface flex items-center justify-center text-muted hover:text-main hover:border-oceanBlue transition-colors">
+          <svg id="menu-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div id="mobile-menu" class="fixed inset-0 z-30 bg-bg/95 backdrop-blur-xl flex flex-col justify-center px-8 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden">
+    <nav class="flex flex-col space-y-6 text-2xl font-bold">
+      <a href="index.html#work" class="mobile-nav-link hover:text-oceanBlue transition-colors">Corporate</a>
+      <a href="index.html#uiux" class="mobile-nav-link hover:text-oceanBlue transition-colors">Freelance</a>
+      <a href="index.html#about" class="mobile-nav-link hover:text-oceanBlue transition-colors">Personal</a>
+      <a href="index.html#contact" class="mobile-nav-link hover:text-oceanBlue transition-colors">Contact</a>
+    </nav>
+    <div class="mt-12 pt-8 border-t border-border flex items-center justify-between text-xs text-muted">
+      <span>Jakarta, Indonesia</span>
+      <a href="index.html#contact" class="mobile-nav-link text-oceanBlue font-semibold underline">Get in touch</a>
+    </div>
+  </div>
+
+  <main class="relative z-10 pt-20">
+    <section class="px-6 md:px-12 max-w-7xl mx-auto py-16 md:py-24 border-b border-border">
+      <div class="flex items-center gap-3 mb-6 text-xs text-muted font-medium">
+        <a href="index.html" class="hover:text-oceanBlue transition-colors">Home</a>
+        <span>/</span>
+        <a href="index.html#work" class="hover:text-oceanBlue transition-colors">Corporate</a>
+        <span>/</span>
+        <span class="text-oceanBlue font-semibold">Catalog Design</span>
+      </div>
+
+      <div class="max-w-4xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-oceanBlue/10 text-oceanBlue text-xs font-semibold mb-6">
+          <span>Featured Project • 2026</span>
+        </div>
+        <h1 class="dark-element text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-tight mb-8">
+          Catalog Design
+        </h1>
+        <p class="text-lg md:text-xl text-muted font-normal leading-relaxed mb-12">
+          Combining structured information, detailed product visuals, and purposeful layouts to make complex details easier to understand.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-12 border-t border-border text-sm">
+        <div>
+          <span class="text-muted block mb-1 text-xs uppercase tracking-wider font-semibold">Category</span>
+          <span class="font-bold text-main">Layout &amp; Composition</span>
+        </div>
+        <div>
+          <span class="text-muted block mb-1 text-xs uppercase tracking-wider font-semibold">Year</span>
+          <span class="font-bold text-main">2024 - 2026</span>
+        </div>
+        <div>
+          <span class="text-muted block mb-1 text-xs uppercase tracking-wider font-semibold">Role</span>
+          <span class="font-bold text-main">RND Staff</span>
+        </div>
+        <div>
+          <span class="text-muted block mb-1 text-xs uppercase tracking-wider font-semibold">Platform</span>
+          <span class="font-bold text-main">Web Dashboard &amp; Print</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="px-6 md:px-12 max-w-7xl mx-auto py-16">
+      <div class="img-zoom-container rounded-2xl overflow-hidden aspect-[16/9] bg-surface border border-border shadow-sm">
+        <img src="https://picsum.photos/id/1062/1600/900" alt="Apex Financial System Preview" class="w-full h-full object-cover">
+      </div>
+    </section>
+
+    <section class="px-6 md:px-12 max-w-7xl mx-auto py-16 border-t border-border">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
+        <div>
+          <span class="text-xs uppercase tracking-widest text-orangeAccent font-bold mb-2 block">01 / Background</span>
+          <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Catalog &amp; Information Architecture</h2>
+        </div>
+        <div class="md:col-span-2 space-y-6 text-muted font-normal leading-relaxed text-base md:text-lg">
+          <p>
+            Platform finansial modern memerlukan representasi visual yang rapi dan terstruktur agar data bernilai tinggi dapat dibaca dengan cepat tanpa distorsi visual. Proyek Apex Financial System menuntut pembuatan katalog lengkap dan sistem desain yang konsisten untuk modul transaksi, manajemen aset, dan laporan analitik instan.
+          </p>
+          <p>
+            Pendekatan katalog ini tidak hanya berfokus pada estetika permukaan, melainkan keterbacaan data numerik dalam jumlah besar, konsistensi token warna untuk status finansial (sukses, pending, gagal), serta tata letak tipografi yang terukur ketat.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="px-6 md:px-12 max-w-7xl mx-auto py-16">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="img-zoom-container rounded-2xl overflow-hidden aspect-[4/3] bg-surface border border-border shadow-sm">
+          <img src="https://picsum.photos/id/1060/1000/750" alt="Apex Component Library" class="w-full h-full object-cover">
+        </div>
+        <div class="img-zoom-container rounded-2xl overflow-hidden aspect-[4/3] bg-surface border border-border shadow-sm">
+          <img src="https://picsum.photos/id/1069/1000/750" alt="Apex Analytics Layout" class="w-full h-full object-cover">
+        </div>
+      </div>
+    </section>
+
+    <section class="px-6 md:px-12 max-w-7xl mx-auto py-16 border-t border-border">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
+        <div>
+          <span class="text-xs uppercase tracking-widest text-oceanBlue font-bold mb-2 block">02 / Eksekusi</span>
+          <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Sistem Token &amp; Komponen</h2>
+        </div>
+        <div class="md:col-span-2 space-y-6 text-muted font-normal leading-relaxed text-base md:text-lg">
+          <p>
+            Setiap elemen dalam katalog dirancang agar modular. Komponen tabel, kartu ringkasan metrik, dan grafik interaktif distandarisasi menggunakan grid berskala konsisten. Hal ini mempercepat tim pengembang dalam menerjemahkan desain ke dalam kode frontend yang bersih.
+          </p>
+          <ul class="space-y-4 pt-4 border-t border-border text-main font-medium">
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-oceanBlue"></span>
+              <span>Grid tata letak berbasis desimal untuk ketepatan visual pixel-perfect.</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-oceanBlue"></span>
+              <span>Palet warna netral yang dioptimalkan untuk mode terang dan gelap.</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-oceanBlue"></span>
+              <span>Tipografi monospaced untuk kolom angka finansial agar kesejajaran vertikal terjaga.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="px-6 md:px-12 max-w-7xl mx-auto py-20 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-6">
+      <a href="index.html#work" class="inline-flex items-center gap-2 text-sm font-semibold text-oceanBlue hover:underline">
+        <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+        <span>Kembali ke Semua Proyek</span>
+      </a>
+      <a href="index.html#contact" class="px-6 py-3 rounded-full bg-oceanBlue text-white text-sm font-semibold hover:bg-oceanBlue/90 transition-colors shadow-sm">
+        Diskusikan Proyek Serupa
+      </a>
+    </section>
+  </main>
+
+  <footer class="border-t border-border py-8 px-6 md:px-12 max-w-7xl mx-auto text-xs text-muted font-medium flex flex-col sm:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-oceanBlue inline-block"></span>
+      <span>&copy; 2026 Anggeruuuu. All rights reserved.</span>
+    </div>
+    <div>
+      <a href="https://drive.google.com/file/d/1XjHKdDCgudLAeNIL2pH6hiQmnoO5HM80/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="hover:text-oceanBlue transition-colors">Simplified Portfolio</a>
+    </div>
+  </footer>
+
+  <script>
+        const logo = document.querySelector('img[alt="Logo"]');
+        const darkElements = document.querySelectorAll('.dark-element');
+
+function updateLogo() {
+    const logoRect = logo.getBoundingClientRect();
+
+    const isOverDarkSection = [...darkSections].some(section => {
+        const rect = section.getBoundingClientRect();
+        return logoRect.top < rect.bottom && logoRect.bottom > rect.top;
+    });
+
+    logo.style.filter = isOverDarkSection ? 'brightness(0) invert(1)' : 'brightness(1)';
+}
+
+window.addEventListener('scroll', updateLogo);
+window.addEventListener('resize', updateLogo);
+
+updateLogo();
+    document.addEventListener("DOMContentLoaded", () => {
+      const themeToggleBtn = document.getElementById('theme-toggle');
+      const sunIcon = document.getElementById('sun-icon');
+      const moonIcon = document.getElementById('moon-icon');
+      const htmlEl = document.documentElement;
+
+      function setTheme(isDark) {
+        if (isDark) {
+          htmlEl.classList.add('dark');
+          sunIcon.classList.remove('hidden');
+          sunIcon.classList.add('block');
+          moonIcon.classList.remove('block');
+          moonIcon.classList.add('hidden');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          htmlEl.classList.remove('dark');
+          sunIcon.classList.remove('block');
+          sunIcon.classList.add('hidden');
+          moonIcon.classList.remove('hidden');
+          moonIcon.classList.add('block');
+          localStorage.setItem('theme', 'light');
+        }
+      }
+
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        setTheme(true);
+      } else {
+        setTheme(false);
+      }
+
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+          const isDark = htmlEl.classList.contains('dark');
+          setTheme(!isDark);
+        });
+      }
+
+      if (typeof Lenis !== 'undefined') {
+        const lenis = new Lenis({
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          smoothWheel: true,
+          touchMultiplier: 2,
+        });
+
+        function raf(time) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        if (typeof ScrollTrigger !== 'undefined') {
+          lenis.on('scroll', ScrollTrigger.update);
+          gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+          });
+          gsap.ticker.lagSmoothing(0);
+        }
+      }
+
+      const menuBtn = document.getElementById('menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const menuIcon = document.getElementById('menu-icon');
+      let isMenuOpen = false;
+
+      if (menuBtn && mobileMenu) {
+        menuBtn.addEventListener('click', () => {
+          isMenuOpen = !isMenuOpen;
+          if (isMenuOpen) {
+            gsap.to(mobileMenu, { opacity: 1, pointerEvents: 'auto', duration: 0.3, ease: 'power2.out' });
+            menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+          } else {
+            gsap.to(mobileMenu, { opacity: 0, pointerEvents: 'none', duration: 0.3, ease: 'power2.in' });
+            menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>';
+          }
+        });
+      }
+
+      const cursor = document.getElementById('cursor');
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!prefersReducedMotion && cursor) {
+        window.addEventListener('mousemove', (e) => {
+          gsap.to(cursor, {
+            x: e.clientX,
+            y: e.clientY,
+            duration: 0.15,
+            ease: "power2.out"
+          });
+        });
+
+        document.querySelectorAll('a, button').forEach(el => {
+          el.addEventListener('mouseenter', () => {
+            gsap.to(cursor, { scale: 1.4, borderColor: '#0066CC', duration: 0.2 });
+          });
+          el.addEventListener('mouseleave', () => {
+            gsap.to(cursor, { scale: 1, borderColor: 'rgba(0, 102, 204, 0.4)', duration: 0.2 });
+          });
+        });
+      }
+    });
+    if (window.matchMedia('(pointer: fine)').matches) {
+  const style = document.createElement('style');
+  style.innerHTML = '*, *::before, *::after { cursor: none !important; }';
+  document.head.appendChild(style);
+}
+  </script>
+</body>
+</html>
